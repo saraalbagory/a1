@@ -6,6 +6,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class SignUpView extends StatefulWidget {
   const SignUpView({super.key});
+  static const String routeName="Sign Up screen";
 
   @override
   State<SignUpView> createState() => _SignUpViewState();
