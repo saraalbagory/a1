@@ -1,21 +1,38 @@
+import 'dart:nativewrappers/_internal/vm/lib/developer.dart';
+
+import 'package:a1/database_services/local_database_service.dart';
+import 'package:a1/database_services/repositry.dart';
+import 'package:a1/models/sign_in_credentials.dart';
+import 'package:a1/models/student_model.dart';
+import 'package:a1/view/profile_screen.dart';
 import 'package:a1/view/sign_up_view.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class SignInScreen extends StatefulWidget {
-  const SignInScreen({super.key});
+  SignInScreen({super.key});
   static const String routeName = "Sign In screen";
+  final Repository repo = Repository();
 
   @override
   State<SignInScreen> createState() => _SignInScreenState();
 }
 
 class _SignInScreenState extends State<SignInScreen> {
+  final _formKey = GlobalKey<FormState>();
+  final TextEditingController studentIDController = TextEditingController();
+  final TextEditingController passwordController = TextEditingController();
+
+  @override
+  void dispose() {
+    studentIDController.dispose();
+    passwordController.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
-    final _formKey = GlobalKey<FormState>();
-    final TextEditingController studentIDController = TextEditingController();
-    final TextEditingController passwordController = TextEditingController();
+    StudentModel? student;
     return Scaffold(
       body: Container(
         height: MediaQuery.of(context).size.height,
@@ -33,13 +50,13 @@ class _SignInScreenState extends State<SignInScreen> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Text(
-                "Hello",
-                style: TextStyle(
-                  color: const Color.fromARGB(255, 255, 255, 255),
-                  fontWeight: FontWeight.w700,
-                  fontSize: 26.r,
-                ),
+              "Hello",
+              style: TextStyle(
+                color: const Color.fromARGB(255, 255, 255, 255),
+                fontWeight: FontWeight.w700,
+                fontSize: 26.r,
               ),
+            ),
             // IconButton(onPressed: ()=>{
             //   Navigator.pop(context)
             // },padding: EdgeInsets.symmetric(vertical: 30.h,horizontal: 25.w),
@@ -68,6 +85,8 @@ class _SignInScreenState extends State<SignInScreen> {
                   ),
                 ),
                 child: SingleChildScrollView(
+                  keyboardDismissBehavior:
+                      ScrollViewKeyboardDismissBehavior.onDrag,
                   child: Form(
                     key: _formKey,
                     child: Column(
@@ -87,6 +106,14 @@ class _SignInScreenState extends State<SignInScreen> {
                         ),
                         TextFormField(
                           controller: passwordController,
+                          validator: (value) {
+                            if (value!.isEmpty) return "Password is required";
+                            if (value.length < 8 ||
+                                !value.contains(RegExp(r'\d'))) {
+                              return "Password must be 8+ chars and contain a number";
+                            }
+                            return null;
+                          },
                           // key: _formKey,
                           decoration: InputDecoration(
                             labelText: "password",
@@ -98,7 +125,60 @@ class _SignInScreenState extends State<SignInScreen> {
                         ),
                         SizedBox(height: 10.h),
                         InkWell(
-                          onTap: () => {},
+                          onTap:
+                              () async => {
+                                // Validate returns true if the form is valid, or false otherwise.
+                                if (_formKey.currentState!.validate())
+                                  {
+                                    student = await widget.repo.signIn(
+                                      SignInCredentials(
+                                        studentId:
+                                            studentIDController.text.trim(),
+                                        password:
+                                            passwordController.text.trim(),
+                                      ),
+                                    ),
+                                    if (student != null)
+                                      {
+                                        print("student found"),
+                                        if (student!.password !=
+                                            passwordController.text.trim())
+                                          {
+                                            ScaffoldMessenger.of(
+                                              context,
+                                            ).showSnackBar(
+                                              SnackBar(
+                                                content: Text("wrong password"),
+                                              ),
+                                            ),
+                                          }
+                                        else
+                                          {
+                                            print(student),
+                                            Navigator.popAndPushNamed(
+                                              context,
+                                              ProfileScreen.routeName,
+                                              arguments: student,
+                                            ),
+                                          },
+                                      },
+                                  }
+                                else
+                                  {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      const SnackBar(
+                                        content: Text('Invalid credentials'),
+                                      ),
+                                    ),
+                                  },
+
+                                // ScaffoldMessenger.of(context).showSnackBar(
+                                //   const SnackBar(
+                                //     content: Text('Processing Data'),
+                                //   ),
+                                // ),
+                              },
+
                           child: Container(
                             margin: EdgeInsets.symmetric(horizontal: 8.w),
                             width: double.infinity,
@@ -117,7 +197,7 @@ class _SignInScreenState extends State<SignInScreen> {
                             ),
                             child: Center(
                               child: Text(
-                                "SIGN UP",
+                                "SIGN IN",
                                 style: TextStyle(
                                   fontSize: 20.r,
                                   color: Color.fromARGB(255, 249, 248, 249),

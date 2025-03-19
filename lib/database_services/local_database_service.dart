@@ -1,3 +1,5 @@
+import 'package:a1/models/sign_in_credentials.dart';
+import 'package:a1/models/student_model.dart';
 import 'package:path/path.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 //import 'package:sqflite_common_ffi/sqflite_ffi.dart';
@@ -8,7 +10,8 @@ import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 class DatabaseHelper {
   static final DatabaseHelper instance = DatabaseHelper._init();
   static Database? _database;
-
+  final String _studentsTableName = "students";
+  // private constructor
   DatabaseHelper._init();
 
   Future<Database> get database async {
@@ -17,6 +20,7 @@ class DatabaseHelper {
     _database = await _initDB();
     return _database!;
   }
+  //get the database
 
   Future<Database> _initDB() async {
     final dbPath = await getDatabasesPath();
@@ -26,7 +30,7 @@ class DatabaseHelper {
       path,
       version: 1, // 🔹 **ADD THIS LINE** to specify the database version
       onCreate: (db, version) async {
-        await db.execute('''CREATE TABLE students (
+        await db.execute('''CREATE TABLE $_studentsTableName (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         name TEXT NOT NULL,
         gender TEXT,
@@ -36,6 +40,22 @@ class DatabaseHelper {
         password TEXT NOT NULL)''');
       },
     );
+  }
+
+  Future<StudentModel?> signIn(SignInCredentials credentials) async {
+    final db = await instance.database;
+    final result = await db.query(
+      _studentsTableName,
+      where: 'student_id = ?',
+      whereArgs: [credentials.studentId],
+    );
+    if (result.isNotEmpty) {
+      StudentModel student =
+          result.map((e) => StudentModel.mapToStudent(e)).first;
+      return student;
+    }
+    print(result);
+    return null;
   }
 
   // static final DatabaseHelper instance = DatabaseHelper._init();

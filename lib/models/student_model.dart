@@ -24,5 +24,17 @@ class StudentModel {
       'level': level,
       'password': password,
     };
+
+  }
+ static StudentModel mapToStudent(Map map)
+  {
+    return StudentModel(
+      name: map['name'] ?? '',
+      gender: map['gender'],
+      email: map['email'] ?? '',
+      studentID: map['student_id'] ?? '',
+      level: map['level'],
+      password: map['password'] ?? '',
+    );
   }
 }

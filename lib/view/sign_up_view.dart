@@ -1,12 +1,12 @@
 import 'dart:developer';
 import 'package:a1/models/student_model.dart';
-import 'package:a1/sign_up_logic.dart';
+import 'package:a1/database_services/sign_up_logic.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class SignUpView extends StatefulWidget {
   const SignUpView({super.key});
-  static const String routeName="Sign Up screen";
+  static const String routeName = "Sign Up screen";
 
   @override
   State<SignUpView> createState() => _SignUpViewState();
@@ -38,8 +38,8 @@ class _SignUpViewState extends State<SignUpView> {
 
         log("Calling signUp...");
         String response = await signUp(newStudent);
+        //TODO: IF the user registered take the new student and pass it to the new page
         log("Response received: $response");
-
         ScaffoldMessenger.of(
           context,
         ).showSnackBar(SnackBar(content: Text(response)));
@@ -84,6 +84,7 @@ class _SignUpViewState extends State<SignUpView> {
                           "Email is required",
                           validator: (value) {
                             if (value!.isEmpty) return "Email is required";
+                            //TODO:NEED TO TRIME THE EMAIL BEFORE VALIDATION SAME FOR THE ID
                             if (!RegExp(
                               r"^[0-9]+@stud.fci-cu.edu.eg$",
                             ).hasMatch(value)) {

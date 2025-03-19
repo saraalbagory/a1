@@ -1,3 +1,4 @@
+import 'package:a1/view/profile_screen.dart';
 import 'package:a1/view/sign_in_screen.dart';
 import 'package:a1/view/sign_up_view.dart';
 import 'package:a1/view/welcome_screen.dart';
@@ -23,8 +24,9 @@ class MyApp extends StatelessWidget {
           debugShowCheckedModeBanner: false,
           routes: {
             WelcomeScreen.routeName: (context) => const WelcomeScreen(),
-            SignInScreen.routeName: (context) => const SignInScreen(),
+            SignInScreen.routeName: (context) => SignInScreen(),
             SignUpView.routeName: (context) => const SignUpView(),
+            ProfileScreen.routeName: (context)=> ProfileScreen()
           },
           initialRoute: WelcomeScreen.routeName,
         );
