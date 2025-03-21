@@ -57,6 +57,19 @@ class DatabaseHelper {
     print(result);
     return null;
   }
+  Future<StudentModel?> updateStudent(StudentModel student) async {
+    final db = await instance.database;
+    final result = await db.update(
+      _studentsTableName,
+      student.toMap(),
+      where: 'student_id = ?',
+      whereArgs: [student.studentID],
+    );
+    if (result != 0) {
+      return student;
+    }
+    return null;
+  }
 
   // static final DatabaseHelper instance = DatabaseHelper._init();
   // static Database? _database;

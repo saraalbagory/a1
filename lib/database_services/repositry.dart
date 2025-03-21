@@ -6,7 +6,10 @@ class Repository {
   Repository();
   final DatabaseHelper _localDatabaseService = DatabaseHelper.instance;
   Future<StudentModel?> signIn(SignInCredentials credentials) async {
-    _localDatabaseService.signIn(credentials);
+    return _localDatabaseService.signIn(credentials);
+  }
+  Future<StudentModel?> updateStudent(StudentModel student) async {
+    return _localDatabaseService.updateStudent(student);
   }
   // Future<String> signUp(StudentModel student) async {
   //   try {

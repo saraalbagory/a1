@@ -1,6 +1,7 @@
 import 'dart:developer';
 import 'package:a1/models/student_model.dart';
 import 'package:a1/database_services/sign_up_logic.dart';
+import 'package:a1/view/profile_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
@@ -43,6 +44,11 @@ class _SignUpViewState extends State<SignUpView> {
         ScaffoldMessenger.of(
           context,
         ).showSnackBar(SnackBar(content: Text(response)));
+        Navigator.popAndPushNamed(
+          context,
+          ProfileScreen.routeName,
+          arguments: newStudent,
+        );
       }
     } catch (e) {
       log("Error in callSignup: ${e.toString()}");
