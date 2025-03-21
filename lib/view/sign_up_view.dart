@@ -44,11 +44,13 @@ class _SignUpViewState extends State<SignUpView> {
         ScaffoldMessenger.of(
           context,
         ).showSnackBar(SnackBar(content: Text(response)));
-        Navigator.popAndPushNamed(
-          context,
-          ProfileScreen.routeName,
-          arguments: newStudent,
-        );
+        if (response == "Signup success") {
+          Navigator.popAndPushNamed(
+            context,
+            ProfileScreen.routeName,
+            arguments: newStudent,
+          );
+        }
       }
     } catch (e) {
       log("Error in callSignup: ${e.toString()}");

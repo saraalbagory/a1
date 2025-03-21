@@ -3,7 +3,6 @@ import 'package:a1/models/student_model.dart';
 import 'local_database_service.dart';
 //import 'dart:developer';
 
-
 Future<String> signUp(StudentModel user) async {
   log("Fetching database...");
   final db = await DatabaseHelper.instance.database;
@@ -16,7 +15,8 @@ Future<String> signUp(StudentModel user) async {
   }
 
   try {
-    await db.insert('students', user.toMap());
+    user.profileImage = "assets/Images/Profile-PNG-Photo.png";
+    await db.insert('studentsProfile', user.toMap());
     log("Signup success");
     return 'Signup success';
   } catch (e) {

@@ -10,7 +10,7 @@ import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 class DatabaseHelper {
   static final DatabaseHelper instance = DatabaseHelper._init();
   static Database? _database;
-  final String _studentsTableName = "students";
+  final String _studentsTableName = "studentsProfile";
   // private constructor
   DatabaseHelper._init();
 
@@ -24,7 +24,7 @@ class DatabaseHelper {
 
   Future<Database> _initDB() async {
     final dbPath = await getDatabasesPath();
-    final path = join(dbPath, 'students.db');
+    final path = join(dbPath, '$_studentsTableName.db');
 
     return await openDatabase(
       path,
@@ -37,7 +37,9 @@ class DatabaseHelper {
         email TEXT UNIQUE NOT NULL,
         student_id TEXT UNIQUE NOT NULL,
         level INTEGER,
-        password TEXT NOT NULL)''');
+        password TEXT NOT NULL,
+        profile_image TEXT
+        )''');
       },
     );
   }
@@ -57,6 +59,7 @@ class DatabaseHelper {
     print(result);
     return null;
   }
+
   Future<StudentModel?> updateStudent(StudentModel student) async {
     final db = await instance.database;
     final result = await db.update(
