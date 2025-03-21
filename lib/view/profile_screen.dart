@@ -58,8 +58,39 @@ class _ProfileScreenState extends State<ProfileScreen> {
         level = student.level; // Initialize level with student's saved level
         gender =
             student.gender; // Initialize gender with student's saved gender
+        if (student.profileImage != null && student.profileImage!.isNotEmpty) {
+          _image = File(student.profileImage!);
+        }
       });
     });
+  }
+
+  Future<void> _uploadImage(String imagePath) async {
+    try {
+      final Directory = await getApplicationDocumentsDirectory();
+      final fileName = imagePath.split('/').last;
+      final savedImagePath = '${Directory.path}/$fileName';
+      final File localImage = await File(imagePath).copy(savedImagePath);
+      setState(() {
+        _image = localImage;
+      });
+      log("Image uploaded successfully");
+    } catch (e) {
+      log("Error in _uploadImage: ${e.toString()}");
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("An error occurred during image upload :$e")),
+      );
+    }
+  }
+
+  Future<void> _pickImage(ImageSource source) async {
+    final pickedFile = await ImagePicker().pickImage(source: source);
+    if (pickedFile != null) {
+      setState(() {
+        _image = File(pickedFile.path);
+      });
+      _uploadImage(pickedFile.path);
+    }
   }
 
   void editProfile() async {
@@ -72,13 +103,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
           password: passwordController.text.trim(),
           gender: gender,
           level: level,
+          profileImage: _image?.path,
         );
 
         log("Calling profile...");
         StudentModel? updatedStudent = await widget.repo.updateStudent(
           newStudent,
         );
-        //TODO: IF the user registered take the new student and pass it to the new page
         log("Response received: $updatedStudent");
         if (updatedStudent == null) {
           ScaffoldMessenger.of(context).showSnackBar(
@@ -120,6 +151,21 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 children: [
                   Column(
                     children: [
+                      Container(
+                        child: CircleAvatar(
+                          radius: 50.r,
+                          backgroundImage:
+                              _image != null
+                                  ? FileImage(_image!)
+                                  : (student.profileImage != null &&
+                                      File(student.profileImage!).existsSync())
+                                  ? FileImage(File(student.profileImage!))
+                                  : AssetImage(
+                                        "assets/Images/Profile-PNG-Photo.png",
+                                      )
+                                      as ImageProvider,
+                        ),
+                      ),
                       // Container(
                       //   width: 100.w,
                       //   height: 100.h,
@@ -131,26 +177,24 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       //     ),
                       //   ),
                       // ),
-                      SizedBox(
-                        height: 8.h,
-                      ), // Add some spacing between the image and the buttons
-                      // Row(
-                      //   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      //   children: [
-                      //     IconButton(
-                      //       onPressed: () {
-                      //         _pickImage(ImageSource.gallery);
-                      //       },
-                      //       icon: Icon(Icons.image),
-                      //     ),
-                      //     IconButton(
-                      //       onPressed: () {
-                      //         _pickImage(ImageSource.camera);
-                      //       },
-                      //       icon: Icon(Icons.camera_alt),
-                      //     ),
-                      //   ],
-                      // ),
+                      SizedBox(height: 8.h),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: [
+                          IconButton(
+                            onPressed: () {
+                              _pickImage(ImageSource.gallery);
+                            },
+                            icon: Icon(Icons.image),
+                          ),
+                          IconButton(
+                            onPressed: () {
+                              _pickImage(ImageSource.camera);
+                            },
+                            icon: Icon(Icons.camera_alt),
+                          ),
+                        ],
+                      ),
                     ],
                   ),
 
