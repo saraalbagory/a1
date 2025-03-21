@@ -37,12 +37,12 @@ class _SignUpViewState extends State<SignUpView> {
         );
 
         log("Calling signUp...");
-        String response = await signUp(newStudent);
+        Map<String, dynamic> response = await signUp(newStudent);
         //TODO: IF the user registered take the new student and pass it to the new page
         log("Response received: $response");
         ScaffoldMessenger.of(
           context,
-        ).showSnackBar(SnackBar(content: Text(response)));
+        ).showSnackBar(SnackBar(content: Text(response.toString())));
       }
     } catch (e) {
       log("Error in callSignup: ${e.toString()}");

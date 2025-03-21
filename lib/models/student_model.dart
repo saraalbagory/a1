@@ -5,6 +5,7 @@ class StudentModel {
   String studentID;
   int? level;
   String password;
+  String? profileImage;
 
   StudentModel({
     required this.name,
@@ -13,6 +14,7 @@ class StudentModel {
     required this.studentID,
     this.level,
     required this.password,
+    this.profileImage,
   });
 
   Map<String, dynamic> toMap() {
@@ -23,11 +25,11 @@ class StudentModel {
       'student_id': studentID,
       'level': level,
       'password': password,
+      'profileImage': profileImage,
     };
-
   }
- static StudentModel mapToStudent(Map map)
-  {
+
+  static StudentModel mapToStudent(Map map) {
     return StudentModel(
       name: map['name'] ?? '',
       gender: map['gender'],
@@ -35,6 +37,7 @@ class StudentModel {
       studentID: map['student_id'] ?? '',
       level: map['level'],
       password: map['password'] ?? '',
+      profileImage: map['profileImage'] ?? '',
     );
   }
 }
