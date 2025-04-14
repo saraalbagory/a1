@@ -10,7 +10,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 class ProfileScreen extends StatefulWidget {
   static const String routeName = "ProfileScreen";
   final Repository repo = Repository();
-   ProfileScreen({super.key});
+  ProfileScreen({super.key});
 
   @override
   State<ProfileScreen> createState() => _ProfileScreenState();
