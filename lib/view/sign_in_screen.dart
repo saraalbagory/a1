@@ -1,6 +1,6 @@
-import 'dart:nativewrappers/_internal/vm/lib/developer.dart';
+// import 'dart:nativewrappers/_internal/vm/lib/developer.dart';
 
-import 'package:a1/database_services/local_database_service.dart';
+// import 'package:a1/database_services/local_database_service.dart';
 import 'package:a1/database_services/repositry.dart';
 import 'package:a1/models/sign_in_credentials.dart';
 import 'package:a1/models/student_model.dart';
@@ -45,16 +45,19 @@ class _SignInScreenState extends State<SignInScreen> {
           ),
         ),
         child: Column(
-          spacing: 25.h,
+          spacing: 20.h,
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Text(
-              "Hello",
-              style: TextStyle(
-                color: const Color.fromARGB(255, 255, 255, 255),
-                fontWeight: FontWeight.w700,
-                fontSize: 26.r,
+            Padding(
+              padding: EdgeInsets.only(top: 40.h, left: 25.w),
+              child: Text(
+                "Hello",
+                style: TextStyle(
+                  color: const Color.fromARGB(255, 255, 255, 255),
+                  fontWeight: FontWeight.w700,
+                  fontSize: 34.r,
+                ),
               ),
             ),
             // IconButton(onPressed: ()=>{
@@ -62,7 +65,7 @@ class _SignInScreenState extends State<SignInScreen> {
             // },padding: EdgeInsets.symmetric(vertical: 30.h,horizontal: 25.w),
             //  icon: Icon(Icons.arrow_back,color: Colors.white,size: 24.r,)),
             Padding(
-              padding: EdgeInsets.symmetric(vertical: 40.h, horizontal: 25.w),
+              padding: EdgeInsets.only(left: 25.w, bottom: 40.h),
               child: Text(
                 "Sign In",
                 style: TextStyle(
@@ -161,6 +164,16 @@ class _SignInScreenState extends State<SignInScreen> {
                                               arguments: student,
                                             ),
                                           },
+                                      }
+                                    else
+                                      {
+                                        ScaffoldMessenger.of(
+                                          context,
+                                        ).showSnackBar(
+                                          SnackBar(
+                                            content: Text("student not found"),
+                                          ),
+                                        ),
                                       },
                                   }
                                 else

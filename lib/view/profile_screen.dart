@@ -1,11 +1,26 @@
+import 'dart:io';
+
 import 'package:a1/database_services/repositry.dart';
 import 'package:a1/models/student_model.dart';
 import 'package:flutter/material.dart';
 import 'dart:developer';
+import 'package:image_picker/image_picker.dart';
+//import 'package:path/path.dart';
 
-import 'package:a1/database_services/sign_up_logic.dart';
+import 'package:path_provider/path_provider.dart'; // Add this import
+//import 'package:a1/database_services/sign_up_logic.dart';
 
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:permission_handler/permission_handler.dart';
+
+Future<void> requestPermissions() async {
+  if (await Permission.camera.isDenied) {
+    await Permission.camera.request();
+  }
+  if (await Permission.storage.isDenied) {
+    await Permission.storage.request();
+  }
+}
 
 class ProfileScreen extends StatefulWidget {
   static const String routeName = "ProfileScreen";
@@ -27,6 +42,56 @@ class _ProfileScreenState extends State<ProfileScreen> {
   String? gender;
   int? level;
   final _formKey = GlobalKey<FormState>();
+  late StudentModel student;
+  File? _image;
+  @override
+  void initState() {
+    super.initState();
+    requestPermissions();
+    // Access the student data from ModalRoute in initState
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      StudentModel passedStudent =
+          ModalRoute.of(context)!.settings.arguments as StudentModel;
+
+      setState(() {
+        student = passedStudent; // Initialize student with the passed student
+        level = student.level; // Initialize level with student's saved level
+        gender =
+            student.gender; // Initialize gender with student's saved gender
+        if (student.profileImage != null && student.profileImage!.isNotEmpty) {
+          _image = File(student.profileImage!);
+        }
+      });
+    });
+  }
+
+  Future<void> _uploadImage(String imagePath) async {
+    try {
+      final Directory = await getApplicationDocumentsDirectory();
+      final fileName = imagePath.split('/').last;
+      final savedImagePath = '${Directory.path}/$fileName';
+      final File localImage = await File(imagePath).copy(savedImagePath);
+      setState(() {
+        _image = localImage;
+      });
+      log("Image uploaded successfully");
+    } catch (e) {
+      log("Error in _uploadImage: ${e.toString()}");
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("An error occurred during image upload :$e")),
+      );
+    }
+  }
+
+  Future<void> _pickImage(ImageSource source) async {
+    final pickedFile = await ImagePicker().pickImage(source: source);
+    if (pickedFile != null) {
+      setState(() {
+        _image = File(pickedFile.path);
+      });
+      _uploadImage(pickedFile.path);
+    }
+  }
 
   void editProfile() async {
     try {
@@ -38,26 +103,29 @@ class _ProfileScreenState extends State<ProfileScreen> {
           password: passwordController.text.trim(),
           gender: gender,
           level: level,
+          profileImage: _image?.path,
         );
 
-        log("Calling signUp...");
-        StudentModel? updatedStudent = await widget.repo.updateStudent(newStudent);
-        //TODO: IF the user registered take the new student and pass it to the new page
-        log("Response received: $updatedStudent");
-        if(updatedStudent == null){
-          ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text("An error occurred during signup")));
-        }else{
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text("Profile updated successfully")));
-        Navigator.popAndPushNamed(
-          context,
-          ProfileScreen.routeName,
-          arguments: updatedStudent,
+        log("Calling profile...");
+        StudentModel? updatedStudent = await widget.repo.updateStudent(
+          newStudent,
         );
-      }}
+        log("Response received: $updatedStudent");
+        if (updatedStudent == null) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text("An error occurred during update")),
+          );
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text("Profile updated successfully")),
+          );
+          Navigator.popAndPushNamed(
+            context,
+            ProfileScreen.routeName,
+            arguments: updatedStudent,
+          );
+        }
+      }
     } catch (e) {
       log("Error in callSignup: ${e.toString()}");
       ScaffoldMessenger.of(context).showSnackBar(
@@ -68,9 +136,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final StudentModel student =
-        ModalRoute.of(context)!.settings.arguments as StudentModel;
-       // level=student.level;
+    // final StudentModel student =
+    //     ModalRoute.of(context)!.settings.arguments as StudentModel;
+    // level=student.level;
     return Scaffold(
       appBar: AppBar(title: Text("Profile", style: TextStyle(fontSize: 20.sp))),
       body: SafeArea(
@@ -81,9 +149,58 @@ class _ProfileScreenState extends State<ProfileScreen> {
               key: _formKey,
               child: Column(
                 children: [
+                  Column(
+                    children: [
+                      Container(
+                        child: CircleAvatar(
+                          radius: 50.r,
+                          backgroundImage:
+                              _image != null
+                                  ? FileImage(_image!)
+                                  : (student.profileImage != null &&
+                                      File(student.profileImage!).existsSync())
+                                  ? FileImage(File(student.profileImage!))
+                                  : AssetImage(
+                                        "assets/Images/Profile-PNG-Photo.png",
+                                      )
+                                      as ImageProvider,
+                        ),
+                      ),
+                      // Container(
+                      //   width: 100.w,
+                      //   height: 100.h,
+                      //   decoration: BoxDecoration(
+                      //     shape: BoxShape.circle,
+                      //     image: DecorationImage(
+                      //       image: AssetImage(student.profileImage!),
+                      //       fit: BoxFit.cover,
+                      //     ),
+                      //   ),
+                      // ),
+                      SizedBox(height: 8.h),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: [
+                          IconButton(
+                            onPressed: () {
+                              _pickImage(ImageSource.gallery);
+                            },
+                            icon: Icon(Icons.image),
+                          ),
+                          IconButton(
+                            onPressed: () {
+                              _pickImage(ImageSource.camera);
+                            },
+                            icon: Icon(Icons.camera_alt),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+
                   _buildTextField(
                     nameController,
-                    student.name,// Initial value
+                    student.name, // Initial value
                     false, // Read-only
                     "Name", // Label
                     "Name is required",
@@ -97,7 +214,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     "Email is required",
                     validator: (value) {
                       if (value!.isEmpty) return "Email is required";
-                      
+
                       if (!RegExp(
                         r"^[0-9]+@stud.fci-cu.edu.eg$",
                       ).hasMatch(value.trim())) {
@@ -156,7 +273,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     items:
                         [1, 2, 3, 4].map((e) {
                           return DropdownMenuItem(
-                            
                             value: e,
                             child: Text(
                               "Level $e",
@@ -200,9 +316,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
     String? Function(String?)? validator,
   }) {
     return TextFormField(
-      initialValue: initialValue, // Set the initial value
       readOnly: readOnly, // Set the readOnly property
-      controller: controller,
+      controller: controller..text = initialValue,
       decoration: InputDecoration(
         labelText: label,
         border: OutlineInputBorder(),
