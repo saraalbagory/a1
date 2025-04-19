@@ -40,4 +40,16 @@ class StudentModel {
       profileImage: map['profile_image'],
     );
   }
+
+  static StudentModel fromJson(Map<String, dynamic> data) {
+    return StudentModel(
+      name: data['name'] ?? '',
+      gender: data['gender'],
+      email: data['email'] ?? '',
+      studentID: data['student_id'] ?? '',
+      level: data['level'],
+      password: data['password'] ?? '',
+      profileImage: data['profile_image'],
+    );
+  }
 }

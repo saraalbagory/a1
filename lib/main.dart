@@ -1,3 +1,4 @@
+import 'package:a1/stores/presentation/stores_list.dart';
 import 'package:a1/view/profile_screen.dart';
 import 'package:a1/view/sign_in_screen.dart';
 import 'package:a1/view/sign_up_view.dart';
@@ -22,13 +23,14 @@ class MyApp extends StatelessWidget {
       builder: (_, child) {
         return MaterialApp(
           debugShowCheckedModeBanner: false,
-          routes: {
-            WelcomeScreen.routeName: (context) => const WelcomeScreen(),
-            SignInScreen.routeName: (context) => SignInScreen(),
-            SignUpView.routeName: (context) => const SignUpView(),
-            ProfileScreen.routeName: (context)=> ProfileScreen(),
-          },
-          initialRoute: WelcomeScreen.routeName,
+          // routes: {
+          //   WelcomeScreen.routeName: (context) => const WelcomeScreen(),
+          //   SignInScreen.routeName: (context) => SignInScreen(),
+          //   SignUpView.routeName: (context) => const SignUpView(),
+          //   ProfileScreen.routeName: (context)=> ProfileScreen(),
+          // },
+          // initialRoute: WelcomeScreen.routeName,
+          home: StoresList(),
         );
       },
 

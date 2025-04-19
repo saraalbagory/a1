@@ -7,7 +7,7 @@ import 'dart:developer';
 import 'package:image_picker/image_picker.dart';
 //import 'package:path/path.dart';
 
-import 'package:path_provider/path_provider.dart'; // Add this import
+import 'package:path_provider/path_provider.dart';
 //import 'package:a1/database_services/sign_up_logic.dart';
 
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -54,10 +54,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
           ModalRoute.of(context)!.settings.arguments as StudentModel;
 
       setState(() {
-        student = passedStudent; // Initialize student with the passed student
-        level = student.level; // Initialize level with student's saved level
-        gender =
-            student.gender; // Initialize gender with student's saved gender
+        student = passedStudent;
+        level = student.level;
+        gender = student.gender;
         if (student.profileImage != null && student.profileImage!.isNotEmpty) {
           _image = File(student.profileImage!);
         }
