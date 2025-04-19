@@ -1,5 +1,6 @@
 import 'package:a1/stores/api_services/stores_api_service.dart';
 import 'package:a1/stores/data/models/store_model.dart';
+import 'package:a1/stores/database_service/stores_database_services.dart';
 import 'package:flutter/material.dart';
 
 import 'package:flutter/material.dart';
@@ -7,12 +8,12 @@ import 'package:flutter/material.dart';
 class StoresList extends StatelessWidget {
   static const String routeName = "Stores List screen";
 
-  final StoresApiService storesApiService = StoresApiService();
+  final StoresDatabaseServices _storesDatabaseServices=StoresDatabaseServices();
 
   StoresList({super.key});
 
   Future<List<StoreModel>> getStores() async {
-    return await storesApiService.fetchStores();
+    return await  _storesDatabaseServices.getStores();
   }
 
   @override

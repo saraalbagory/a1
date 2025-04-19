@@ -39,6 +39,26 @@ class StoreModel {
       'formatted_address': location.formattedAddress,
     };
   }
+
+  StoreModel fromMap(Map<String, dynamic> map) {
+    return StoreModel(
+      fsqId: map['fsq_id'],
+      name: map['name'],
+      distance: map['distance'],
+      geocodes: Geocodes(
+        main: storeCenter(
+          latitude: map['latitude'],
+          longitude: map['longitude'],
+        ),
+      ),
+      link: map['link'],
+      location: Location(
+        address: map['address'],
+        formattedAddress: map['formatted_address'],
+        country: Country.EG,
+      ),
+    );
+  }
 }
 
 class GeoBounds {

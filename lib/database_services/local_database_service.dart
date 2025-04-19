@@ -61,22 +61,23 @@ class DatabaseHelper {
           );
         ''');
         await db.execute('''
-          CREATE TABLE $_favoriteStore (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            fsq_id TEXT NOT NULL FOREIGN KEY REFERENCES $_storeTableName(fsq_id),
-            student_id TEXT NOT NULL FOREIGN KEY REFERENCES $_studentsTableName(student_id),
-          );
-        ''');
+            CREATE TABLE favoriteStore (
+              id INTEGER PRIMARY KEY AUTOINCREMENT,
+              fsq_id TEXT NOT NULL,
+              student_id TEXT NOT NULL,
+              FOREIGN KEY (fsq_id) REFERENCES Store(fsq_id),
+              FOREIGN KEY (student_id) REFERENCES studentsProfile(student_id)
+            );       ''');
         //Future<List<StoreModel>> stores = storesApiService.fetchStores();
-        storesApiService.fetchStores().then((stores) async {
-          for (var store in stores) {
-            await db.insert(
-              _storeTableName,
-              store.toMap(),
-              conflictAlgorithm: ConflictAlgorithm.replace,
-            );
-          }
-        });
+        final stores = await storesApiService.fetchStores();
+        for (var store in stores) {
+          await db.insert(
+            _storeTableName,
+            store.toMap(),
+            conflictAlgorithm: ConflictAlgorithm.replace,
+          );
+        }
+        print("Stores inserted successfully");
       },
     );
   }
