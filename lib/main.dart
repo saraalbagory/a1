@@ -5,9 +5,16 @@ import 'package:a1/view/sign_up_view.dart';
 import 'package:a1/view/welcome_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:responsive_sizer/responsive_sizer.dart';
 
 void main() {
-  runApp(const MyApp());
+  runApp(
+    ResponsiveSizer(
+      builder: (context, orientation, deviceType) {
+        return MyApp();
+      },
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {
