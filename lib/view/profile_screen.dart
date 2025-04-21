@@ -1,15 +1,11 @@
 import 'dart:io';
-
 import 'package:a1/database_services/repositry.dart';
 import 'package:a1/models/student_model.dart';
+import 'package:a1/stores/presentation/stores_list.dart';
 import 'package:flutter/material.dart';
 import 'dart:developer';
 import 'package:image_picker/image_picker.dart';
-//import 'package:path/path.dart';
-
 import 'package:path_provider/path_provider.dart';
-//import 'package:a1/database_services/sign_up_logic.dart';
-
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:permission_handler/permission_handler.dart';
 
@@ -36,19 +32,18 @@ class _ProfileScreenState extends State<ProfileScreen> {
   final TextEditingController emailController = TextEditingController();
   final TextEditingController studentIDController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
-  final TextEditingController confirmPasswordController =
-      TextEditingController();
 
   String? gender;
   int? level;
   final _formKey = GlobalKey<FormState>();
   late StudentModel student;
   File? _image;
+  int _currentIndex = 0; // For bottom navigation bar
+
   @override
   void initState() {
     super.initState();
     requestPermissions();
-    // Access the student data from ModalRoute in initState
     WidgetsBinding.instance.addPostFrameCallback((_) {
       StudentModel passedStudent =
           ModalRoute.of(context)!.settings.arguments as StudentModel;
@@ -135,168 +130,161 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   @override
   Widget build(BuildContext context) {
-    // final StudentModel student =
-    //     ModalRoute.of(context)!.settings.arguments as StudentModel;
-    // level=student.level;
+    // Handle navigation between screens
+    final List<Widget> _screens = [_buildProfileContent(), StoresList()];
+
     return Scaffold(
-      appBar: AppBar(title: Text("Profile", style: TextStyle(fontSize: 20.sp))),
-      body: SafeArea(
-        child: SingleChildScrollView(
-          child: Padding(
-            padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 20.h),
-            child: Form(
-              key: _formKey,
-              child: Column(
-                children: [
-                  Column(
-                    children: [
-                      Container(
-                        child: CircleAvatar(
-                          radius: 50.r,
-                          backgroundImage:
-                              _image != null
-                                  ? FileImage(_image!)
-                                  : (student.profileImage != null &&
-                                      File(student.profileImage!).existsSync())
-                                  ? FileImage(File(student.profileImage!))
-                                  : AssetImage(
-                                        "assets/Images/Profile-PNG-Photo.png",
-                                      )
-                                      as ImageProvider,
+      appBar: AppBar(
+        title: Text(
+          _currentIndex == 0 ? "Profile" : "Stores List",
+          style: TextStyle(fontSize: 20.sp),
+        ),
+      ),
+      body: _screens[_currentIndex],
+      bottomNavigationBar: BottomNavigationBar(
+        currentIndex: _currentIndex,
+        onTap: (index) {
+          setState(() {
+            _currentIndex = index;
+          });
+        },
+        items: const [
+          BottomNavigationBarItem(icon: Icon(Icons.person), label: "Profile"),
+          BottomNavigationBarItem(icon: Icon(Icons.store), label: "Stores"),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildProfileContent() {
+    return SafeArea(
+      child: SingleChildScrollView(
+        child: Padding(
+          padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 20.h),
+          child: Form(
+            key: _formKey,
+            child: Column(
+              children: [
+                Column(
+                  children: [
+                    Container(
+                      child: CircleAvatar(
+                        radius: 50.r,
+                        backgroundImage:
+                            _image != null
+                                ? FileImage(_image!)
+                                : (student.profileImage != null &&
+                                    File(student.profileImage!).existsSync())
+                                ? FileImage(File(student.profileImage!))
+                                : AssetImage(
+                                      "assets/Images/Profile-PNG-Photo.png",
+                                    )
+                                    as ImageProvider,
+                      ),
+                    ),
+                    SizedBox(height: 8.h),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        IconButton(
+                          onPressed: () {
+                            _pickImage(ImageSource.gallery);
+                          },
+                          icon: Icon(Icons.image),
                         ),
-                      ),
-                      // Container(
-                      //   width: 100.w,
-                      //   height: 100.h,
-                      //   decoration: BoxDecoration(
-                      //     shape: BoxShape.circle,
-                      //     image: DecorationImage(
-                      //       image: AssetImage(student.profileImage!),
-                      //       fit: BoxFit.cover,
-                      //     ),
-                      //   ),
-                      // ),
-                      SizedBox(height: 8.h),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        children: [
-                          IconButton(
-                            onPressed: () {
-                              _pickImage(ImageSource.gallery);
-                            },
-                            icon: Icon(Icons.image),
-                          ),
-                          IconButton(
-                            onPressed: () {
-                              _pickImage(ImageSource.camera);
-                            },
-                            icon: Icon(Icons.camera_alt),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-
-                  _buildTextField(
-                    nameController,
-                    student.name, // Initial value
-                    false, // Read-only
-                    "Name", // Label
-                    "Name is required",
-                  ),
-                  SizedBox(height: 12.h),
-                  _buildTextField(
-                    emailController,
-                    student.email,
-                    true,
-                    "Email",
-                    "Email is required",
-                    validator: (value) {
-                      if (value!.isEmpty) return "Email is required";
-
-                      if (!RegExp(
-                        r"^[0-9]+@stud.fci-cu.edu.eg$",
-                      ).hasMatch(value.trim())) {
-                        return "Invalid FCAI email format";
-                      }
-                      return null;
-                    },
-                  ),
-                  SizedBox(height: 12.h),
-                  _buildTextField(
-                    studentIDController,
-                    student.studentID,
-                    true,
-                    "Student ID",
-                    "Student ID is required",
-                  ),
-                  SizedBox(height: 12.h),
-                  _buildTextField(
-                    passwordController,
-                    student.password,
-                    false,
-                    "Password",
-                    "Password is required",
-                    isPassword: true,
-                    validator: (value) {
-                      if (value!.isEmpty) return "Password is required";
-                      if (value.length < 8 || !value.contains(RegExp(r'\d'))) {
-                        return "Password must be 8+ chars and contain a number";
-                      }
-                      return null;
-                    },
-                  ),
-                  SizedBox(height: 12.h),
-                  // _buildTextField(
-                  //   confirmPasswordController,
-                  //   "Confirm Password",
-                  //   "Confirm password is required",
-                  //   isPassword: true,
-                  //   validator: (value) {
-                  //     if (value!.isEmpty) {
-                  //       return "Confirm password is required";
-                  //     }
-                  //     if (value != passwordController.text) {
-                  //       return "Passwords do not match";
-                  //     }
-                  //     return null;
-                  //   },
-                  // ),
-                  //SizedBox(height: 12.h),
-                  DropdownButtonFormField<int>(
-                    decoration: InputDecoration(
-                      labelText: "Select Level",
-                      border: OutlineInputBorder(),
+                        IconButton(
+                          onPressed: () {
+                            _pickImage(ImageSource.camera);
+                          },
+                          icon: Icon(Icons.camera_alt),
+                        ),
+                      ],
                     ),
-                    value: level,
-                    items:
-                        [1, 2, 3, 4].map((e) {
-                          return DropdownMenuItem(
-                            value: e,
-                            child: Text(
-                              "Level $e",
-                              style: TextStyle(fontSize: 14.sp),
-                            ),
-                          );
-                        }).toList(),
-                    onChanged: (val) => setState(() => level = val),
+                  ],
+                ),
+                _buildTextField(
+                  nameController,
+                  student.name,
+                  false,
+                  "Name",
+                  "Name is required",
+                ),
+                SizedBox(height: 12.h),
+                _buildTextField(
+                  emailController,
+                  student.email,
+                  true,
+                  "Email",
+                  "Email is required",
+                  validator: (value) {
+                    if (value!.isEmpty) return "Email is required";
+
+                    if (!RegExp(
+                      r"^[0-9]+@stud.fci-cu.edu.eg$",
+                    ).hasMatch(value.trim())) {
+                      return "Invalid FCAI email format";
+                    }
+                    return null;
+                  },
+                ),
+                SizedBox(height: 12.h),
+                _buildTextField(
+                  studentIDController,
+                  student.studentID,
+                  true,
+                  "Student ID",
+                  "Student ID is required",
+                ),
+                SizedBox(height: 12.h),
+                _buildTextField(
+                  passwordController,
+                  student.password,
+                  false,
+                  "Password",
+                  "Password is required",
+                  isPassword: true,
+                  validator: (value) {
+                    if (value!.isEmpty) return "Password is required";
+                    if (value.length < 8 || !value.contains(RegExp(r'\d'))) {
+                      return "Password must be 8+ chars and contain a number";
+                    }
+                    return null;
+                  },
+                ),
+                SizedBox(height: 12.h),
+                DropdownButtonFormField<int>(
+                  decoration: InputDecoration(
+                    labelText: "Select Level",
+                    border: OutlineInputBorder(),
                   ),
-                  SizedBox(height: 12.h),
-                  _buildGenderSelection(),
-                  SizedBox(height: 20.h),
-                  SizedBox(
-                    width: double.infinity,
-                    height: 50.h,
-                    child: ElevatedButton(
-                      onPressed: editProfile,
-                      child: Text(
-                        "Edit Profile",
-                        style: TextStyle(fontSize: 16.sp),
-                      ),
+                  value: level,
+                  items:
+                      [1, 2, 3, 4].map((e) {
+                        return DropdownMenuItem(
+                          value: e,
+                          child: Text(
+                            "Level $e",
+                            style: TextStyle(fontSize: 14.sp),
+                          ),
+                        );
+                      }).toList(),
+                  onChanged: (val) => setState(() => level = val),
+                ),
+                SizedBox(height: 12.h),
+                _buildGenderSelection(),
+                SizedBox(height: 20.h),
+                SizedBox(
+                  width: double.infinity,
+                  height: 50.h,
+                  child: ElevatedButton(
+                    onPressed: editProfile,
+                    child: Text(
+                      "Edit Profile",
+                      style: TextStyle(fontSize: 16.sp),
                     ),
                   ),
-                ],
-              ),
+                ),
+              ],
             ),
           ),
         ),
@@ -304,7 +292,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
-  /// Reusable TextField Widget
   Widget _buildTextField(
     TextEditingController controller,
     String initialValue,
@@ -315,7 +302,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     String? Function(String?)? validator,
   }) {
     return TextFormField(
-      readOnly: readOnly, // Set the readOnly property
+      readOnly: readOnly,
       controller: controller..text = initialValue,
       decoration: InputDecoration(
         labelText: label,
@@ -326,7 +313,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
-  /// Gender Selection Widget
   Widget _buildGenderSelection() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,

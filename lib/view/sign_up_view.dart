@@ -63,7 +63,7 @@ class _SignUpViewState extends State<SignUpView> {
   @override
   Widget build(BuildContext context) {
     return ScreenUtilInit(
-      designSize: Size(375, 812), // Base iPhone X size (adjust as needed)
+      designSize: Size(375, 812),
       builder:
           (_, child) => Scaffold(
             appBar: AppBar(

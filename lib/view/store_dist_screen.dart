@@ -4,13 +4,13 @@ import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
-import 'package:responsive_sizer/responsive_sizer.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class StoreDistanceScreen extends StatefulWidget {
   final StoreModel store;
 
   const StoreDistanceScreen({super.key, required this.store});
-
+  static const String routeName = "Store Distance screen";
   @override
   State<StoreDistanceScreen> createState() => _StoreDistanceScreenState();
 }
@@ -100,7 +100,7 @@ class _StoreDistanceScreenState extends State<StoreDistanceScreen> {
       body: Column(
         children: [
           SizedBox(
-            height: 60.h,
+            height: 370.h,
             width: double.infinity,
             child: ClipRRect(
               borderRadius: BorderRadius.circular(20),
@@ -111,7 +111,6 @@ class _StoreDistanceScreenState extends State<StoreDistanceScreen> {
                   TileLayer(
                     urlTemplate:
                         "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
-                    subdomains: ['a', 'b', 'c'],
                   ),
                   MarkerLayer(
                     markers: [

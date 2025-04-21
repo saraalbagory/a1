@@ -1,18 +1,19 @@
 import 'package:a1/stores/presentation/stores_list.dart';
+import 'package:a1/stores/providers/store_provider.dart';
+import 'package:a1/view/home_screen.dart';
 import 'package:a1/view/profile_screen.dart';
 import 'package:a1/view/sign_in_screen.dart';
 import 'package:a1/view/sign_up_view.dart';
 import 'package:a1/view/welcome_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:responsive_sizer/responsive_sizer.dart';
+import 'package:provider/provider.dart';
 
 void main() {
   runApp(
-    ResponsiveSizer(
-      builder: (context, orientation, deviceType) {
-        return MyApp();
-      },
+    MultiProvider(
+      providers: [ChangeNotifierProvider(create: (_) => StoreProvider())],
+      child: MyApp(),
     ),
   );
 }
@@ -30,14 +31,16 @@ class MyApp extends StatelessWidget {
       builder: (_, child) {
         return MaterialApp(
           debugShowCheckedModeBanner: false,
-          // routes: {
-          //   WelcomeScreen.routeName: (context) => const WelcomeScreen(),
-          //   SignInScreen.routeName: (context) => SignInScreen(),
-          //   SignUpView.routeName: (context) => const SignUpView(),
-          //   ProfileScreen.routeName: (context)=> ProfileScreen(),
-          // },
-          // initialRoute: WelcomeScreen.routeName,
-          home: StoresList(),
+          routes: {
+            WelcomeScreen.routeName: (context) => const WelcomeScreen(),
+            SignInScreen.routeName: (context) => SignInScreen(),
+            SignUpView.routeName: (context) => const SignUpView(),
+            ProfileScreen.routeName: (context) => ProfileScreen(),
+            StoresList.routeName: (context) => const StoresList(),
+            HomeScreen.routeName: (context) => HomeScreen(),
+          },
+          initialRoute: WelcomeScreen.routeName,
+          //home: StoresList(),
         );
       },
 
