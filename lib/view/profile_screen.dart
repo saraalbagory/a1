@@ -134,12 +134,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
     final List<Widget> _screens = [_buildProfileContent(), StoresList()];
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text(
-          _currentIndex == 0 ? "Profile" : "Stores List",
-          style: TextStyle(fontSize: 20.sp),
-        ),
-      ),
+      // appBar: AppBar(
+      //   title: Text(
+      //     _currentIndex == 0 ? "Profile" : "Stores List",
+      //     style: TextStyle(fontSize: 20.sp),
+      //   ),
+      // ),
       body: _screens[_currentIndex],
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _currentIndex,
