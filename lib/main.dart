@@ -36,7 +36,7 @@ class MyApp extends StatelessWidget {
             SignInScreen.routeName: (context) => SignInScreen(),
             SignUpView.routeName: (context) => const SignUpView(),
             ProfileScreen.routeName: (context) => ProfileScreen(),
-            StoresList.routeName: (context) => const StoresList(),
+            // StoresList.routeName: (context) => StoresList(),
             HomeScreen.routeName: (context) => HomeScreen(),
           },
           initialRoute: WelcomeScreen.routeName,

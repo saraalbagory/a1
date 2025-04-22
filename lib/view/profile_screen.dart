@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:a1/database_services/repositry.dart';
 import 'package:a1/models/student_model.dart';
+import 'package:a1/stores/presentation/fav_stores_screen.dart';
 import 'package:a1/stores/presentation/stores_list.dart';
 import 'package:flutter/material.dart';
 import 'dart:developer';
@@ -131,7 +132,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
   @override
   Widget build(BuildContext context) {
     // Handle navigation between screens
-    final List<Widget> _screens = [_buildProfileContent(), StoresList()];
+    final List<Widget> _screens = [
+      StoresList(studentId: student.studentID),
+      _buildProfileContent(),
+      FavStoresScreen(studentID: student.studentID),
+    ];
 
     return Scaffold(
       // appBar: AppBar(
@@ -149,8 +154,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
           });
         },
         items: const [
-          BottomNavigationBarItem(icon: Icon(Icons.person), label: "Profile"),
           BottomNavigationBarItem(icon: Icon(Icons.store), label: "Stores"),
+          BottomNavigationBarItem(icon: Icon(Icons.person), label: "Profile"),
+
+          BottomNavigationBarItem(
+            icon: Icon(Icons.favorite_rounded),
+            label: "Fav Stores",
+          ),
         ],
       ),
     );
