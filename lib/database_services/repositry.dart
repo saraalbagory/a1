@@ -1,7 +1,6 @@
 import 'package:a1/common/connectivity.dart';
 import 'package:a1/database_services/api_services.dart';
 import 'package:a1/database_services/local_database_service.dart';
-import 'package:a1/database_services/sign_up_logic.dart';
 import 'package:a1/models/sign_in_credentials.dart';
 import 'package:a1/models/student_model.dart';
 

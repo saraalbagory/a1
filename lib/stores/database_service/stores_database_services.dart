@@ -68,8 +68,7 @@ class StoresDatabaseServices {
       whereArgs: [studentId],
     );
 
-    if (favoriteIds.isEmpty) 
-    {
+    if (favoriteIds.isEmpty) {
       print("No favorite stores found for this student.");
       return [];
     }
@@ -77,14 +76,13 @@ class StoresDatabaseServices {
     final List<String> storeIds =
         favoriteIds.map((e) => e['fsq_id'] as String).toList();
 
-    // Now fetch the store details for each fsq_id from the stores table
+    //fetch the store details for each fsq_id
     final List<Map<String, dynamic>> storeMaps = await db.query(
-      DatabaseUtilities.storeTableName, 
+      DatabaseUtilities.storeTableName,
       where: 'fsq_id IN (${List.filled(storeIds.length, '?').join(', ')})',
       whereArgs: storeIds,
     );
 
-    // Convert each row to StoreModel
     return storeMaps
         .map(
           (map) => StoreModel(
@@ -116,21 +114,23 @@ class StoresDatabaseServices {
       conflictAlgorithm: ConflictAlgorithm.replace,
     );
     if (effectedRows > 0) {
+      print("Store added to favorites successfully");
       return true;
     } else {
       print("Failed to add store to favorites");
       return false;
     }
   }
+
   Future<bool> isFavorite(String fsqId, String studentId) async {
-  final db = await DatabaseHelper.instance.database;
-  final result = await db.query(
-    DatabaseUtilities.favoriteStore,
-    where: 'fsq_id = ? AND student_id = ?',
-    whereArgs: [fsqId, studentId],
-  );
-  return result.isNotEmpty;
-}
+    final db = await DatabaseHelper.instance.database;
+    final result = await db.query(
+      DatabaseUtilities.favoriteStore,
+      where: 'fsq_id = ? AND student_id = ?',
+      whereArgs: [fsqId, studentId],
+    );
+    return result.isNotEmpty;
+  }
 
   Future<bool> removeFavoriteStore(String fsq_id, String studentId) async {
     final db = await DatabaseHelper.instance.database;

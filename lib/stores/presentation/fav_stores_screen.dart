@@ -1,4 +1,3 @@
-import 'package:a1/stores/database_service/stores_database_services.dart';
 import 'package:a1/stores/presentation/store_dist_screen.dart';
 import 'package:a1/stores/providers/store_provider.dart';
 import 'package:flutter/material.dart';
@@ -14,8 +13,7 @@ class FavStoresScreen extends StatefulWidget {
 }
 
 class _FavStoresScreenState extends State<FavStoresScreen> {
-//  Color _buttonColor = Colors.white; 
-  
+  //  Color _buttonColor = Colors.white;
 
   @override
   void initState() {
@@ -31,7 +29,6 @@ class _FavStoresScreenState extends State<FavStoresScreen> {
     final storeProvider = Provider.of<StoreProvider>(context);
     final stores = storeProvider.favStores;
 
-
     return Scaffold(
       appBar: AppBar(title: const Text(" Fav Stores in Cairo")),
       body:
@@ -44,10 +41,10 @@ class _FavStoresScreenState extends State<FavStoresScreen> {
                 itemBuilder: (context, index) {
                   final store = stores[index];
                   return ListTile(
-                    title: Text(store.name,
-                        style: const TextStyle(
-                          fontWeight: FontWeight.bold,
-                        )),
+                    title: Text(
+                      store.name,
+                      style: const TextStyle(fontWeight: FontWeight.bold),
+                    ),
                     subtitle: Text(store.location.address ?? 'No address'),
                     leading: const Icon(Icons.store),
                     trailing: SizedBox(
@@ -67,22 +64,51 @@ class _FavStoresScreenState extends State<FavStoresScreen> {
                             },
                           ),
                           IconButton(
+                            // onPressed: () async {
+                            //   final provider = Provider.of<StoreProvider>(
+                            //     context,
+                            //     listen: false,
+                            //   );
+                            //   provider.removeStoreFromFavorites(
+                            //     store.fsqId,
+                            //     widget.studentID,
+                            //   );
+                            //   //await provider.loadFavStores(widget.studentID);
+
+                            //   ScaffoldMessenger.of(context).showSnackBar(
+                            //     SnackBar(
+                            //       content: Text(
+                            //         '${store.name} removed from favorites',
+                            //       ),
+                            //     ),
+                            //   );
+                            //   setState(() {
+                            //     storeProvider.loadFavStores(widget.studentID);
+                            //   });
+                            // },
                             onPressed: () async {
                               final provider = Provider.of<StoreProvider>(
                                 context,
                                 listen: false,
                               );
-                              provider.removeStoreFromFavorites(
+                              await provider.removeStoreFromFavorites(
                                 store.fsqId,
                                 widget.studentID,
                               );
+
                               setState(() {
-                                storeProvider.loadFavStores(widget.studentID);
-                                
+                                provider.favoritedStoreIds.remove(
+                                  store.fsqId,
+                                ); // for animation
                               });
+
+                              await Future.delayed(
+                                Duration(milliseconds: 300),
+                              ); // for smooth feedback
+                              provider.loadFavStores(widget.studentID);
                             },
-                            icon: Icon
-                            (Icons.delete, color:Colors.red,),
+
+                            icon: Icon(Icons.delete, color: Colors.red),
                           ),
                         ],
                       ),

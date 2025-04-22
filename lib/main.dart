@@ -1,4 +1,3 @@
-import 'package:a1/stores/presentation/stores_list.dart';
 import 'package:a1/stores/providers/store_provider.dart';
 import 'package:a1/view/home_screen.dart';
 import 'package:a1/view/profile_screen.dart';

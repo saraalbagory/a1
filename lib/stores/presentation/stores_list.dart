@@ -1,5 +1,3 @@
-import 'package:a1/stores/data/models/store_model.dart';
-import 'package:a1/stores/database_service/stores_database_services.dart';
 import 'package:a1/stores/providers/store_provider.dart';
 import 'package:a1/stores/presentation/store_dist_screen.dart';
 import 'package:flutter/material.dart';
@@ -15,17 +13,17 @@ class StoresList extends StatefulWidget {
 }
 
 class _StoresListState extends State<StoresList> {
-  
   @override
   void initState() {
     super.initState();
-    Future.microtask(() {
+    Future.microtask(() async {
       final provider = Provider.of<StoreProvider>(context, listen: false);
-      provider.loadStores();
+      await provider.loadStores();
+      await provider.loadFavStores(widget.studentId);
     });
   }
 
-  bool isStoreFavorite( String fsqId) {
+  bool isStoreFavorite(String fsqId) {
     final storeProvider = Provider.of<StoreProvider>(context, listen: false);
     final favoritedStores = storeProvider.favStores;
     return favoritedStores.any((store) => store.fsqId == fsqId);
@@ -63,7 +61,8 @@ class _StoresListState extends State<StoresList> {
                                   context,
                                   MaterialPageRoute(
                                     builder:
-                                        (_) => StoreDistanceScreen(store: store),
+                                        (_) =>
+                                            StoreDistanceScreen(store: store),
                                   ),
                                 );
                               },
@@ -72,25 +71,50 @@ class _StoresListState extends State<StoresList> {
                               icon: Icon(
                                 Icons.favorite,
                                 color:
-                                isStoreFavorite(store.fsqId)
+                                    storeProvider.favoritedStoreIds.contains(
+                                          store.fsqId,
+                                        )
                                         ? Colors.red
                                         : Colors.grey,
                               ),
-                    
                               onPressed: () async {
                                 final provider = Provider.of<StoreProvider>(
                                   context,
                                   listen: false,
                                 );
-                                await provider.addStoreToFavorites(
-                                  store.fsqId,
-                                  widget.studentId,
-                                );
-                    
-                                setState(() {
-                                 // mark as removed
-                                  favoritedStoreIds.add(store.fsqId);
-                                });
+                                final isCurrentlyFavorite = provider
+                                    .favoritedStoreIds
+                                    .contains(store.fsqId);
+                                // await provider.addStoreToFavorites(
+                                //   store.fsqId,
+                                //   widget.studentId,
+                                // );
+                                // setState(() {
+                                //   provider.favoritedStoreIds.add(
+                                //     store.fsqId,
+                                //   ); // for animation
+                                // });
+                                if (isCurrentlyFavorite) {
+                                  await provider.removeStoreFromFavorites(
+                                    store.fsqId,
+                                    widget.studentId,
+                                  );
+                                  setState(() {
+                                    provider.favoritedStoreIds.remove(
+                                      store.fsqId,
+                                    ); // for animation
+                                  });
+                                } else {
+                                  await provider.addStoreToFavorites(
+                                    store.fsqId,
+                                    widget.studentId,
+                                  );
+                                  setState(() {
+                                    provider.favoritedStoreIds.add(
+                                      store.fsqId,
+                                    ); // for animation
+                                  });
+                                }
                               },
                             ),
                           ],

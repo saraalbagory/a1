@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 
 class StoreProvider extends ChangeNotifier {
   List<StoreModel> stores = [];
-  List<StoreModel> favStores=[];
+  List<StoreModel> favStores = [];
   Set<String> favoritedStoreIds = {};
   bool isLoading = false;
   String? error;
@@ -25,15 +25,14 @@ class StoreProvider extends ChangeNotifier {
       notifyListeners();
     }
   }
-  Future<void> loadFavStores( String studId) async {
-    
+
+  Future<void> loadFavStores(String studId) async {
     isLoading = true;
     error = null;
     notifyListeners();
 
     try {
       favStores = await _dbService.getFavoriteStores(studId);
-
     } catch (e) {
       error = e.toString();
     } finally {
@@ -58,10 +57,9 @@ class StoreProvider extends ChangeNotifier {
       isLoading = false;
       notifyListeners();
     }
-}
+  }
 
-
-Future<void> removeStoreFromFavorites(String studentId, String fsqId) async {
+  Future<void> removeStoreFromFavorites(String studentId, String fsqId) async {
     isLoading = true;
     error = null;
     notifyListeners();
@@ -79,21 +77,17 @@ Future<void> removeStoreFromFavorites(String studentId, String fsqId) async {
   }
 
   Future<void> toggleFavorite(String fsqId, String studentId) async {
-    bool isFavorite=await _dbService.isFavorite(fsqId, studentId);
+    bool isFavorite = await _dbService.isFavorite(fsqId, studentId);
     if (isFavorite) {
       await _dbService.removeFavoriteStore(fsqId, studentId);
-    
     } else {
       await _dbService.addFavoriteStore(fsqId, studentId);
-      
     }
     notifyListeners();
   }
 
-  Future isFavorite(String fsqId,String studentId) async{
-    bool isFavorite=await _dbService.isFavorite(fsqId, studentId);
-    return isFavorite ;
+  Future isFavorite(String fsqId, String studentId) async {
+    bool isFavorite = await _dbService.isFavorite(fsqId, studentId);
+    return isFavorite;
   }
 }
-
-  
